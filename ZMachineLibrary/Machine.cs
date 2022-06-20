@@ -44,7 +44,7 @@ namespace ZMachineLibrary
 		private const int FlagsTwoPointer = 0x10;
 		private const int AbbreviationTableOffset = 0x18;
 
-		private IConsoleIO _io;
+		private ZMachineIO _io;
 		private byte[] _memory;
 		private Stream _file;
 		private bool _running;
@@ -87,7 +87,7 @@ namespace ZMachineLibrary
         #endregion
         #region Constructors
 
-        public Machine(IConsoleIO io)
+        public Machine(ZMachineIO io)
 		{
 			_io = io;
 

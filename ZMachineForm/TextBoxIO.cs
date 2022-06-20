@@ -6,7 +6,7 @@ using ZMachineLibrary;
 
 namespace ZMachineForm
 {
-    public class TextBoxIO : IConsoleIO
+    public class TextBoxIO : ZMachineIO
     {
 	    #region Event handling
 

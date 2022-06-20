@@ -13,7 +13,7 @@ namespace ZMachineLibrary
 		FixedPitch = 8
 	}
 
-	public interface IConsoleIO
+	public interface ZMachineIO
 	{
         #region Properties
         string Input { set; }
