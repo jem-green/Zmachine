@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ZMachineLib
+namespace ZMachineLibrary
 {
 	[Flags]
 	public enum TextStyle

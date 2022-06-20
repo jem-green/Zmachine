@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ZMachineLib
+namespace ZMachineLibrary
 {
 	internal delegate void OpcodeHandler(List<ushort> args);
 

@@ -1,4 +1,4 @@
-namespace ZMachineLib
+namespace ZMachineLibrary
 {
 	internal enum OperandType
 	{

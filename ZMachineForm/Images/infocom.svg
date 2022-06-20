@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Inkscape 0.48.2 r9819 (http://www.inkscape.org/) -->
+<!-- Optimised by GCO -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" id="inFocomBanner" viewBox="0 0 567 100">
+
+<desc>Infocom(tm) Logo</desc>
+
+<style><![CDATA[
+  path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 24px;
+    stroke-linecap: round;
+    stroke-linejoin: round
+  }
+  rect {
+    fill: none;
+    stroke: #000;
+    stroke-width: 24px
+  }
+]]></style>
+
+<g>
+  <rect x="0" y="0" width="100%" height="100%" style="fill:#fff; stroke:none" />
+</g>
+
+<g transform="translate(20,0)" id="i">
+  <path d="m0,80 l0,-60" />
+</g> <!-- i -->
+
+<g transform="translate(48,0)" id="n">
+  <path d="m0,80 l0,-59 57,0 0,59" />
+  <rect
+    style="fill:#000; stroke:none"
+    rx="4px"
+    x="-12" y="9"
+    width="18px" height="18px"
+  />
+  <path id="radiusFill1" transform="translate(12,33)"
+    style="fill:#000; stroke:none"
+    d="m0,0 2,0 a2,2 0 0 0 -2,2z"
+  />
+  <path id="radiusFill1" transform="translate(45,33) rotate(90)"
+    style="fill:#000; stroke:none"
+    d="m0,0 2,0 a2,2 0 0 0 -2,2z"
+  />
+</g> <!-- n -->
+
+<g transform="translate(133,0)" id="F">
+  <path d="m0,80 l0,-59 58,0 M0,49 l58,0" />
+  <path id="radiusFill2" transform="translate(12,33)"
+    style="fill:#000; stroke:none"
+    d="m2,0 -2,0 0,4 2,0 a2,2 0 0 1 0,-4z"
+  />
+  <path id="radiusFill1" transform="translate(12,61)"
+    style="fill:#000; stroke:none"
+    d="m0,0 2,0 a2,2 0 0 0 -2,2z"
+  />
+</g> <!-- F -->
+
+<g transform="translate(196,0)" id="o1">
+  <rect
+    x="22" y="21"
+    width="57" height="58"
+    rx="16"
+  />
+</g> <!-- o -->
+
+<g transform="translate(281,0)" id="c">
+  <rect
+    x="22" y="21"
+    width="58" height="58"
+    rx="16"
+  />
+  <path
+    style="stroke:#fff; stroke-width:32px; stroke-linecap:butt"
+    d="M77,8 L77,91"
+  />
+  <path d="M60,21 L81,21" />
+  <path d="M60,79 L81,79" />
+</g> <!-- c -->
+
+<g transform="translate(364,2)" id="o2">
+  <rect
+    x="22" y="18"
+    width="58" height="59"
+    rx="16"
+  />
+</g> <!-- o -->
+
+<g transform="translate(452,0)" id="m">
+  <path d="m20,20 l0,59" />
+  <path d="m20,20 l56,0 19,59" />
+  <path d="m50,21 l0,58" />
+  <rect
+    style="fill:#000; stroke:none"
+    rx="4.5px"
+    x="8" y="8"
+    width="18px" height="18px"
+  />
+  <path
+    style="stroke-width:3px"
+    d="m32,33 l39,0"
+  />
+  <circle
+    cx="35" cy="35" r="3"
+    fill="#fff"
+    stroke="none"
+  />
+  <circle
+    cx="65" cy="35" r="3"
+    fill="#fff"
+    stroke="none"
+  />
+</g> <!-- m -->
+
+<text id="TM" text-anchor="start" fill="#000" transform="translate(542,0)">
+  <tspan x="0" y="18" style="font-size:12px; font-family:Sans-Serif; font-weight:800">TM</tspan>
+</text>
+
+</svg>

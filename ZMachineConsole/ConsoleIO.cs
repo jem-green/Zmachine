@@ -1,23 +1,158 @@
-﻿#define SIMPLE_IO
-
-using System;
+﻿using System;
 using System.IO;
-using ZMachineLib;
+using ZMachineLibrary;
 
-namespace ConsoleZMachine
+namespace ZMachineConsole
 {
-	public class ConsoleIO : IZMachineIO
-	{
-		private int _lines;
+    public class ConsoleIO : IConsoleIO
+    {
+        #region Event handling
+
+        /// <summary>
+        /// Occurs when the Zmachine recives a message.
+        /// </summary>
+        public event EventHandler<TextEventArgs> TextReceived;
+
+        /// <summary>
+        /// Handles the actual event
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnTextReceived(TextEventArgs e)
+        {
+            EventHandler<TextEventArgs> handler = TextReceived;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        #endregion
+        #region Fields
+
+        private int consoleWidth = 75;
+        private int zoneWidth = 15;
+        private int compactWidth = 3;
+        private int hpos = 0;
+        private int vpos = 0;
+        private string input = "";
+        private string output = "";
+        protected readonly object lockObject = new Object();
+        private int _lines;
 		private readonly ConsoleColor _defaultFore;
 		private readonly ConsoleColor _defaultBack;
+		private int _window;
 
-		public ConsoleIO()
+        #endregion
+        #region Constructors
+        public ConsoleIO()
 		{
 			Console.SetBufferSize(Console.WindowWidth, Console.WindowHeight);
 			Console.SetCursorPosition(0, Console.WindowHeight-1);
 			_defaultFore = Console.ForegroundColor;
 			_defaultBack = Console.BackgroundColor;
+		}
+		#endregion
+		#region Properties
+		public int Compact
+		{
+			get
+			{
+				return (compactWidth);
+			}
+			set
+			{
+				compactWidth = value;
+			}
+		}
+
+        public string Input
+        {
+            set
+            {
+                // need to wait here while the input is being read
+                lock (lockObject)
+                {
+                    input = input + value;
+                }
+            }
+        }
+
+        public string Output
+        {
+            get
+            {
+                string temp;
+                // need to wait here while the output is being written
+                lock (lockObject)
+                {
+                    temp = output;
+                    output = "";
+                }
+                return (temp);
+            }
+        }
+
+        public int Hpos
+        {
+            get
+            {
+                return (hpos);
+            }
+        }
+
+        public int Vpos
+        {
+            get
+            {
+                return (vpos);
+            }
+        }
+
+		public int Width
+		{
+			get
+			{
+				return (consoleWidth);
+			}
+			set
+			{
+				consoleWidth = value;
+			}
+		}
+
+		public int Window
+		{
+			get
+			{
+				return (_window);
+			}
+			set
+			{
+				_window = value;
+			}
+		}
+
+		public int Zone
+        {
+            get
+            {
+                return (zoneWidth);
+            }
+            set
+            {
+                zoneWidth = value;
+            }
+        }
+
+
+		#endregion
+		#region Methods
+
+		public void Clear()
+		{
+		}
+
+		public Cursor Position(int window)
+		{
+			return (new Cursor(hpos,vpos));
 		}
 
 		public void Print(string s)
@@ -41,11 +176,15 @@ namespace ConsoleZMachine
 					}
 				}
 
-				if(i < s.Length && s[i] == Environment.NewLine[0])
-					Console.MoveBufferArea(0, 0, Console.WindowWidth, _lines, 0, 1);
+                if (i < s.Length && s[i] == Environment.NewLine[0])
+                {
+                    Console.MoveBufferArea(0, 0, Console.WindowWidth, _lines, 0, 1);
+                }
 
-				if(i < s.Length)
-					Console.Write(s[i]);
+                if (i < s.Length)
+                {
+                    Console.Write(s[i]);
+                }
 			}
 		}
 
@@ -102,8 +241,10 @@ namespace ConsoleZMachine
 
 		public void SetWindow(ushort window)
 		{
-			if(window == 0)
-				Console.SetCursorPosition(0, Console.WindowHeight-1);
+            if (window == 0)
+            {
+                Console.SetCursorPosition(0, Console.WindowHeight - 1);
+            }
 		}
 
 		public void EraseWindow(ushort window)
@@ -125,6 +266,7 @@ namespace ConsoleZMachine
 
 		public void ShowStatus()
 		{
+			throw new NotImplementedException("ShowStatus");
 		}
 
 		public void SetTextStyle(TextStyle textStyle)
@@ -132,21 +274,33 @@ namespace ConsoleZMachine
 			switch(textStyle)
 			{
 				case TextStyle.Roman:
-					Console.ResetColor();
-					break;
+                    {
+                        Console.ResetColor();
+                        break;
+                    }
 				case TextStyle.Reverse:
-					ConsoleColor temp = Console.BackgroundColor;
-					Console.BackgroundColor = Console.ForegroundColor;
-					Console.ForegroundColor = temp;
-					break;
+                    {
+                        ConsoleColor temp = Console.BackgroundColor;
+                        Console.BackgroundColor = Console.ForegroundColor;
+                        Console.ForegroundColor = temp;
+                        break;
+                    }
 				case TextStyle.Bold:
-					break;
+                    {
+                        break;
+                    }
 				case TextStyle.Italic:
-					break;
+                    {
+                        break;
+                    }
 				case TextStyle.FixedPitch:
-					break;
+                    {
+                        break;
+                    }
 				default:
-					throw new ArgumentOutOfRangeException(nameof(textStyle), textStyle, null);
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(textStyle), textStyle, null);
+                    }
 			}
 		}
 
@@ -158,19 +312,43 @@ namespace ConsoleZMachine
 
 		public void SoundEffect(ushort number)
 		{
-			if(number == 1)
-				Console.Beep(2000, 300);
-			else if(number == 2)
-				Console.Beep(250, 300);
-			else
-				throw new Exception("Sound > 2");
+            if (number == 1)
+            {
+                Console.Beep(2000, 300);
+            }
+            else if (number == 2)
+            {
+                Console.Beep(250, 300);
+            }
+            else
+            {
+                throw new Exception("Sound > 2");
+            }
 		}
 
 		public void Quit()
 		{
+			throw new NotImplementedException("Quit");
 		}
 
-		private ConsoleColor ZColorToConsoleColor(ZColor c, bool fore)
+		public bool Save(Stream s)
+		{
+			FileStream fs = File.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "save"));
+			s.CopyTo(fs);
+			fs.Close();
+			return true;
+		}
+
+		public Stream Restore()
+		{
+			FileStream fs = File.OpenRead(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "save"));
+			return fs;
+		}
+
+        #endregion
+        #region Private
+
+        private ConsoleColor ZColorToConsoleColor(ZColor c, bool fore)
 		{
 			switch(c)
 			{
@@ -207,18 +385,6 @@ namespace ConsoleZMachine
 			return Console.ForegroundColor;
 		}
 
-		public bool Save(Stream s)
-		{
-			FileStream fs = File.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "save"));
-			s.CopyTo(fs);
-			fs.Close();
-			return true;
-		}
-
-		public Stream Restore()
-		{
-			FileStream fs = File.OpenRead(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "save"));
-			return fs;
-		}
+        #endregion
 	}
 }
