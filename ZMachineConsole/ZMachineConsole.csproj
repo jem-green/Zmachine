@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZMachineLib\ZMachineLibrary.csproj">
+    <ProjectReference Include="..\ZMachineLibrary\ZMachineLibrary.csproj">
       <Project>{8130ab87-4ad2-4025-bbe8-fa1d06f6df9e}</Project>
       <Name>ZMachineLibrary</Name>
     </ProjectReference>
