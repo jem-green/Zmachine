@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using TracerLibrary;
 
 namespace ZMachineLibrary
 {
@@ -15,28 +16,28 @@ namespace ZMachineLibrary
             public void FailUnimplemented(Machine machine)
             {
                 machine.finish = true;
-                log.Error("Unimplemented function: " + Name());
+                TraceInternal.TraceError("Unimplemented function: " + Name());
             }
         }
 
         private abstract class OpcodeHandler_0OP : OpcodeHandler
         {
-            abstract public void Run(Machine machine, IConsoleIO consoleIO);
+            abstract public void Run(Machine machine, IZmachineIO consoleIO);
         }
 
         private abstract class OpcodeHandler_1OP : OpcodeHandler
         {
-            abstract public void Run(Machine machine, IConsoleIO consoleIO, ushort v1);
+            abstract public void Run(Machine machine, IZmachineIO consoleIO, ushort v1);
         }
 
         private abstract class OpcodeHandler2OP : OpcodeHandler
         {
             // Implement one or the other of these:
-            public virtual void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public virtual void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 FailUnimplemented(machine);
             }
-            public virtual void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public virtual void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 Run(machine, consoleIO, operands[0], operands[1]);
             }
@@ -44,7 +45,7 @@ namespace ZMachineLibrary
 
         private abstract class OpcodeHandlerOPVAR : OpcodeHandler
         {
-            abstract public void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands);
+            abstract public void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands);
         }
 
         // Unknown OP Classes
@@ -54,7 +55,7 @@ namespace ZMachineLibrary
             {
                 return "UNKNOWN 2OP";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 FailUnimplemented(machine);
             }
@@ -66,7 +67,7 @@ namespace ZMachineLibrary
             {
                 return "UNKNOWN 1OP";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 FailUnimplemented(machine);
             }
@@ -78,7 +79,7 @@ namespace ZMachineLibrary
             {
                 return "UNKNOWN 0OP";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -90,7 +91,7 @@ namespace ZMachineLibrary
             {
                 return "UNKNOWN OPVAR";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 FailUnimplemented(machine);
             }
@@ -110,9 +111,9 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
-                log.Debug("in Run()");
+                Debug.WriteLine("in Run()");
                 bool branchOn = false;
                 for (int i = 1; i < operands.Count; i++)
                 {
@@ -121,9 +122,9 @@ namespace ZMachineLibrary
                         branchOn = true;
                     }
                 }
-                log.Info(op);
+                TraceInternal.TraceInformation(op);
                 machine.Branch(branchOn);
-                log.Debug("Out Run");
+                TraceInternal.TraceVerbose("Out Run");
             }
         }
 
@@ -136,7 +137,7 @@ namespace ZMachineLibrary
             {
                 return "op_jl";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.Branch((short)v1 < (short)v2);
             }
@@ -151,7 +152,7 @@ namespace ZMachineLibrary
             {
                 return "op_jg";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.Branch((short)v1 > (short)v2);
             }
@@ -167,14 +168,14 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
-                log.Debug("In Run");
-                log.Info("op");
+                Debug.WriteLine("In Run()");
+                TraceInternal.TraceInformation("op");
                 int value = ((short)machine.GetVar(v1)) - 1;
                 machine.SetVar(v1, (ushort)value);
                 machine.Branch(value < v2);
-                log.Debug("out Run");
+                Debug.WriteLine("Out Run()");
             }
         }
 
@@ -187,7 +188,7 @@ namespace ZMachineLibrary
             {
                 return "op_inc_chk";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 int value = ((short)machine.GetVar(v1)) + 1;
                 machine.SetVar(v1, (ushort)value);
@@ -204,7 +205,7 @@ namespace ZMachineLibrary
             {
                 return "op_jin";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.Branch(machine.objectTable.GetParent(v1) == v2);
             }
@@ -219,7 +220,7 @@ namespace ZMachineLibrary
             {
                 return "op_test";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.Branch((v1 & v2) == v2);
             }
@@ -231,7 +232,7 @@ namespace ZMachineLibrary
             {
                 return "op_or";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)(v1 | v2));
             }
@@ -243,7 +244,7 @@ namespace ZMachineLibrary
             {
                 return "op_and";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)(v1 & v2));
             }
@@ -258,9 +259,9 @@ namespace ZMachineLibrary
             {
                 return "op_test_attr";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
-                log.Debug("Looking for attribute in obj " + v1 + " attribute:" + machine.objectTable.GetObjectAttribute(v1, v2));
+                TraceInternal.TraceVerbose("Looking for attribute in obj " + v1 + " attribute:" + machine.objectTable.GetObjectAttribute(v1, v2));
                 machine.Branch(machine.objectTable.GetObjectAttribute(v1, v2) == true);
             }
         }
@@ -274,7 +275,7 @@ namespace ZMachineLibrary
             {
                 return "op_set_attr";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.objectTable.SetObjectAttribute(v1, v2, true);
             }
@@ -289,7 +290,7 @@ namespace ZMachineLibrary
             {
                 return "op_clear_attr";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.objectTable.SetObjectAttribute(v1, v2, false);
             }
@@ -301,7 +302,7 @@ namespace ZMachineLibrary
         private class OpStore : OpcodeHandler2OP
         {
             public override String Name() { return "op_store"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.SetVar(v1, v2);
             }
@@ -313,7 +314,7 @@ namespace ZMachineLibrary
         private class OpInsertObj : OpcodeHandler2OP
         {
             public override String Name() { return "op_insert_obj"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 int newSibling = machine.objectTable.GetChild(v2); // 
                 machine.objectTable.UnlinkObject(v1);
@@ -332,7 +333,7 @@ namespace ZMachineLibrary
         private class OpLoadw : OpcodeHandler2OP
         {
             public override String Name() { return "op_loadw"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 ushort value = machine.memory.GetWord((uint)v1 + (uint)(2 * v2));
                 machine.SetVar((ushort)machine.PcGetByte(), value);
@@ -345,7 +346,7 @@ namespace ZMachineLibrary
         private class OpLoadb : OpcodeHandler2OP
         {
             public override String Name() { return "op_loadb"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 {
                     ushort value = machine.memory.GetByte((uint)v1 + (uint)v2);
@@ -360,7 +361,7 @@ namespace ZMachineLibrary
         private class OpGetProp : OpcodeHandler2OP
         {
             public override String Name() { return "op_get_prop"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetObjectProperty(v1, v2));
             }
@@ -372,7 +373,7 @@ namespace ZMachineLibrary
         private class OpGetPropAddr : OpcodeHandler2OP
         {
             public override String Name() { return "op_get_prop_addr"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetObjectPropertyAddress(v1, v2));
             }
@@ -384,7 +385,7 @@ namespace ZMachineLibrary
         private class OpGetNextAddr : OpcodeHandler2OP
         {
             public override String Name() { return "op_get_next_addr"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2) { machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetNextObjectPropertyIdAfter(v1, v2)); }
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2) { machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetNextObjectPropertyIdAfter(v1, v2)); }
         }
 
         /// <summary>
@@ -393,7 +394,7 @@ namespace ZMachineLibrary
         private class OpAdd : OpcodeHandler2OP
         {
             public override String Name() { return "op_add"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2) { machine.SetVar(machine.PcGetByte(), (ushort)((short)v1 + (short)v2)); }
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2) { machine.SetVar(machine.PcGetByte(), (ushort)((short)v1 + (short)v2)); }
         }
 
         /// <summary>
@@ -402,7 +403,7 @@ namespace ZMachineLibrary
         private class OpSub : OpcodeHandler2OP
         {
             public override String Name() { return "op_sub"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 int result = (short)v1 - (short)v2;
                 machine.SetVar(machine.PcGetByte(), (ushort)result);
@@ -419,16 +420,16 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
-                log.Debug("In Run()");
-                log.Info(op);
+                Debug.WriteLine("In Run()");
+                TraceInternal.TraceInformation(op);
                 if (v2 != 0)
                 {
                     int result = (short)v1 / (short)v2;
                     machine.SetVar(machine.PcGetByte(), (ushort)result);
                 }
-                log.Debug("Out Run()");
+                Debug.WriteLine("Out Run()");
             }
         }
 
@@ -438,7 +439,7 @@ namespace ZMachineLibrary
         private class OpMod : OpcodeHandler2OP
         {
             public override String Name() { return "op_mod"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 if (v2 == 0) machine.finish = true;         // Interpreter cannot div by 0
 
@@ -450,7 +451,7 @@ namespace ZMachineLibrary
         private class OpMul : OpcodeHandler2OP
         {
             public override String Name() { return "op_mul"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1, ushort v2)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1, ushort v2)
             {
                 int result = (short)v1 * (short)v2;
                 machine.SetVar(machine.PcGetByte(), (ushort)result);
@@ -463,7 +464,7 @@ namespace ZMachineLibrary
         private class OpJz : OpcodeHandler_1OP
         {
             public override String Name() { return "op_jz"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.Branch(v1 == 0);
             }
@@ -472,7 +473,7 @@ namespace ZMachineLibrary
         private class OpGetSibling : OpcodeHandler_1OP
         {
             public override String Name() { return "op_get_sibling"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetSibling(v1));
                 machine.Branch(machine.objectTable.GetSibling(v1) != 0);
@@ -482,7 +483,7 @@ namespace ZMachineLibrary
         private class OpGetChild : OpcodeHandler_1OP
         {
             public override String Name() { return "op_get_child"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetChild(v1));
                 machine.Branch(machine.objectTable.GetChild(v1) != 0);
@@ -491,7 +492,7 @@ namespace ZMachineLibrary
         private class OpGetParent : OpcodeHandler_1OP
         {
             public override String Name() { return "op_get_parent"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1) { machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetParent(v1)); }
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1) { machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetParent(v1)); }
         }
 
         private class OpGetPropLen : OpcodeHandler_1OP
@@ -501,12 +502,12 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
-                log.Debug("In Run");
-                log.Info(op);
+                Debug.WriteLine("In Run");
+                TraceInternal.TraceInformation(op);
                 machine.SetVar(machine.PcGetByte(), (ushort)machine.objectTable.GetObjectPropertyLengthFromAddress(v1));
-                log.Debug("Out Run");
+                Debug.WriteLine("Out Run");
             }
         }
 
@@ -516,7 +517,7 @@ namespace ZMachineLibrary
         private class OpInc : OpcodeHandler_1OP
         {
             public override String Name() { return "op_inc"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 int value = ((short)machine.GetVar(v1)) + 1;
                 machine.SetVar(v1, (ushort)value);
@@ -529,7 +530,7 @@ namespace ZMachineLibrary
         private class OpDec : OpcodeHandler_1OP
         {
             public override String Name() { return "op_dec"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 int value = ((short)machine.GetVar(v1)) - 1;
                 machine.SetVar(v1, (ushort)value);
@@ -542,7 +543,7 @@ namespace ZMachineLibrary
         private class OpNot : OpcodeHandler_1OP
         {
             public override String Name() { return "op_not"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.SetVar(machine.PcGetByte(), (ushort)(~v1));
             }
@@ -554,7 +555,7 @@ namespace ZMachineLibrary
         private class OpPrintAddr : OpcodeHandler_1OP
         {
             public override String Name() { return "op_print_addr"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 consoleIO.Out(machine.memory.GetZSCII(v1, 0).str);
             }
@@ -566,7 +567,7 @@ namespace ZMachineLibrary
         private class OpRemoveObj : OpcodeHandler_1OP
         {
             public override String Name() { return "op_remove_obj"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.objectTable.SetParent(v1, 0);
             }
@@ -578,7 +579,7 @@ namespace ZMachineLibrary
         private class OpPrintObj : OpcodeHandler_1OP
         {
             public override String Name() { return "op_print_obj"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 consoleIO.Out(machine.objectTable.ObjectName(v1));
             }
@@ -590,7 +591,7 @@ namespace ZMachineLibrary
         private class OpRet : OpcodeHandler_1OP
         {
             public override String Name() { return "op_ret"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.PopRoutineData(v1);
             }
@@ -602,7 +603,7 @@ namespace ZMachineLibrary
         private class OpJump : OpcodeHandler_1OP
         {
             public override String Name() { return "op_jump"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 int offset = (short)v1;
                 machine.pc += (uint)(offset - 2);
@@ -615,7 +616,7 @@ namespace ZMachineLibrary
         private class OpPrintPaddr : OpcodeHandler_1OP
         {
             public override String Name() { return "op_print_paddr"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 consoleIO.Out(machine.memory.GetZSCII((uint)v1 * 2, 0).str);
             }
@@ -627,7 +628,7 @@ namespace ZMachineLibrary
         private class OpLoad : OpcodeHandler_1OP
         {
             public override String Name() { return "op_load"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, ushort v1)
+            public override void Run(Machine machine, IZmachineIO consoleIO, ushort v1)
             {
                 machine.SetVar(machine.PcGetWord(), v1);
             }
@@ -641,7 +642,7 @@ namespace ZMachineLibrary
         private class OpRtrue : OpcodeHandler_0OP
         {
             public override String Name() { return "op_rtrue"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 machine.PopRoutineData(1);
             }
@@ -653,7 +654,7 @@ namespace ZMachineLibrary
         private class OpRfalse : OpcodeHandler_0OP
         {
             public override String Name() { return "op_rfalse"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 machine.PopRoutineData(0);
             }
@@ -668,13 +669,13 @@ namespace ZMachineLibrary
             {
                 return "op_print";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
-                log.Debug("Getting string at " + machine.pc);
+                TraceInternal.TraceVerbose("Getting string at " + machine.pc);
                 Memory.StringAndReadLength str = machine.memory.GetZSCII(machine.pc, 0);
                 consoleIO.Out(str.str);
                 machine.pc += (uint)str.bytesRead;
-                log.Debug("New pc location: " + machine.pc);
+                TraceInternal.TraceVerbose("New pc location: " + machine.pc);
 
             }
         }
@@ -685,7 +686,7 @@ namespace ZMachineLibrary
         private class OpPrintRet : OpcodeHandler_0OP
         {
             public override String Name() { return "op_print_ret"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 Memory.StringAndReadLength str = machine.memory.GetZSCII(machine.pc, 0);
                 consoleIO.Out(str.str);
@@ -700,7 +701,7 @@ namespace ZMachineLibrary
         private class OpNop : OpcodeHandler_0OP
         {
             public override String Name() { return "op_nop"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 return;
             }
@@ -712,7 +713,7 @@ namespace ZMachineLibrary
         private class OpSave : OpcodeHandler_0OP
         {
             public override String Name() { return "op_save"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -724,7 +725,7 @@ namespace ZMachineLibrary
         private class OpRestore : OpcodeHandler_0OP
         {
             public override String Name() { return "op_restore"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -736,7 +737,7 @@ namespace ZMachineLibrary
         private class OpRestart : OpcodeHandler_0OP
         {
             public override String Name() { return "op_restart"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -748,7 +749,7 @@ namespace ZMachineLibrary
         private class OpRetPopped : OpcodeHandler_0OP
         {
             public override String Name() { return "op_ret_popped"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 machine.PopRoutineData(machine.GetVar(0));
             }
@@ -760,7 +761,7 @@ namespace ZMachineLibrary
         private class OpPop : OpcodeHandler_0OP
         {
             public override String Name() { return "op_pop"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 machine.GetVar(0);
             }
@@ -772,7 +773,7 @@ namespace ZMachineLibrary
         private class OpQuit : OpcodeHandler_0OP
         {
             public override String Name() { return "op_quit"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 machine.finish = true;
             }
@@ -784,7 +785,7 @@ namespace ZMachineLibrary
         private class OpNewLine : OpcodeHandler_0OP
         {
             public override String Name() { return "op_new_line"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 consoleIO.Out("\n");
             }
@@ -796,7 +797,7 @@ namespace ZMachineLibrary
         private class OpShowStatus : OpcodeHandler_0OP
         {
             public override String Name() { return "op_show_status"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -808,7 +809,7 @@ namespace ZMachineLibrary
         private class OpVerify : OpcodeHandler_0OP
         {
             public override String Name() { return "op_verify"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO)
+            public override void Run(Machine machine, IZmachineIO consoleIO)
             {
                 FailUnimplemented(machine);
             }
@@ -827,18 +828,18 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
-                log.Debug("In Run()");
+                TraceInternal.TraceVerbose("In Run()");
                 if (operands[0] == 0)
                 {
                     ushort variable = machine.PcGetByte();
-                    log.Info(op + " " + variable + ",0");
+                    TraceInternal.TraceInformation(op + " " + variable + ",0");
                     machine.SetVar(variable, 0); //set return value to zero
                 }
                 else
                 {
-                    log.Info(op);
+                    TraceInternal.TraceInformation(op);
                     machine.PushRoutineData(operands);
                 }
             }
@@ -850,7 +851,7 @@ namespace ZMachineLibrary
         private class OpStorew : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_storew"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 machine.memory.SetWord((uint)(operands[0] + 2 * operands[1]), operands[2]);
             }
@@ -862,7 +863,7 @@ namespace ZMachineLibrary
         private class OpStoreb : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_storeb"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 machine.memory.SetByte((uint)(operands[0] + operands[1]), (byte)operands[2]);
             }
@@ -874,7 +875,7 @@ namespace ZMachineLibrary
         private class OpPutProp : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_put_prop"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 machine.objectTable.SetObjectProperty(operands[0], operands[1], operands[2]);
             }
@@ -889,7 +890,7 @@ namespace ZMachineLibrary
             {
                 return "op_sread";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
 
                 machine.lex.Read(operands[0], operands[1]);
@@ -906,7 +907,7 @@ namespace ZMachineLibrary
             {
                 return "op_print_char";
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 Console.Write(machine.memory.GetZChar(operands[0]));
             }
@@ -918,7 +919,7 @@ namespace ZMachineLibrary
         private class OpPrintNum : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_print_num"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 consoleIO.Out(Convert.ToString(operands[0]));
             }
@@ -930,7 +931,7 @@ namespace ZMachineLibrary
         private class OpRandom : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_random"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 int value = 0;
                 if (operands[0] > 0)
@@ -953,7 +954,7 @@ namespace ZMachineLibrary
         private class OpPush : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_push"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 machine.SetVar(0, operands[0]);
             }
@@ -969,10 +970,10 @@ namespace ZMachineLibrary
             {
                 return (op);
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
-                log.Debug("In " + op + " Run()");
-                log.Info(op);
+                Debug.WriteLine("In " + op + " Run()");
+                TraceInternal.TraceInformation(op);
                 machine.SetVar(operands[0], machine.GetVar(0));
             }
         }
@@ -983,7 +984,7 @@ namespace ZMachineLibrary
         private class OpSplitWindow : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_split_window"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 FailUnimplemented(machine);
             }
@@ -995,7 +996,7 @@ namespace ZMachineLibrary
         private class OpSetWindow : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_set_window"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 FailUnimplemented(machine);
             }
@@ -1007,7 +1008,7 @@ namespace ZMachineLibrary
         private class OpOutputStream : OpcodeHandlerOPVAR
         {
             public override String Name() { return "op_output_stream"; }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 if (operands[0] != 0)
                 {
@@ -1036,7 +1037,7 @@ namespace ZMachineLibrary
             {
                 return ("op_input_stream");
             }
-            public override void Run(Machine machine, IConsoleIO consoleIO, List<ushort> operands)
+            public override void Run(Machine machine, IZmachineIO consoleIO, List<ushort> operands)
             {
                 FailUnimplemented(machine);
             }

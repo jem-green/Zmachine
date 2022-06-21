@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using log4net;
+using TracerLibrary;
 
 namespace ZMachineLibrary
 {
     public class Memory
     {
         #region Fields
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         byte[] memory;
         Dictionary<string, ushort> _address;
@@ -184,7 +183,7 @@ namespace ZMachineLibrary
                 return (char)zchar;
             else
             {
-                log.Debug("Invalid 10-bit char: " + (char)zchar);
+                TraceInternal.TraceVerbose("Invalid 10-bit char: " + (char)zchar);
                 return (char)0;
             }
         }
@@ -215,7 +214,7 @@ namespace ZMachineLibrary
                 c[1] = (word >> 5) & 0x01f;
                 c[2] = word & 0x01f;
 
-                //                log.Debug("Reading Zchars \t\t 1:{0}\t 2:{1}\t 3:{2}", c[0], c[1], c[2]);
+                TraceInternal.TraceVerbose("Reading Zchars \t\t 1:{0}\t 2:{1}\t 3:{2}", c[0], c[1], c[2]);
 
                 /* ZSCII codes are 10-bit unsigned values between 0 and 1023.
                  * Summary of the ZSCII rules:
@@ -255,11 +254,10 @@ namespace ZMachineLibrary
                                     zchar10 += c[i];
 
                                     output += GetZChar(zchar10);
-                                    if (log.IsDebugEnabled == true)
-                                    {
-                                        debugOutput += GetZChar(zchar10); z++;
-                                        log.Debug(debugOutput + "(" + z + ")");
-                                    }
+
+                                    debugOutput += GetZChar(zchar10); z++;
+                                    TraceInternal.TraceVerbose(debugOutput + "(" + z + ")");
+
                                     break;
                                 }
                         }
@@ -270,21 +268,17 @@ namespace ZMachineLibrary
                         int abbrevId = (abbrevSet - 1) * 32 + c[i];
                         //get the abbrev string using the current character and append it
                         output += GetAbbrev(abbrevId);
-                        if (log.IsDebugEnabled == true)
-                        {
-                            debugOutput += GetAbbrev(abbrevId); z++;
-                            log.Debug("Abbrev: |" + abbrevId + "| : " + GetAbbrev(abbrevId));
-                        }
+                        debugOutput += GetAbbrev(abbrevId); z++;
+                        TraceInternal.TraceVerbose("Abbrev: |" + abbrevId + "| : " + GetAbbrev(abbrevId));
+
                         abbrevSet = 0;
                     }
                     else if (c[i] == 0)
                     {
                         output += " ";
-                        if (log.IsDebugEnabled == true)
-                        {
-                            debugOutput += (" "); z++;
-                            log.Debug("SPACE" + "(" + z + ")");
-                        }
+                        debugOutput += (" "); z++;
+                        TraceInternal.TraceVerbose("SPACE" + "(" + z + ")");
+
                     }
                     else if (c[i] == 1 || c[i] == 2 || c[i] == 3)  // Get abbreviation at given address using next two values
                     {
@@ -301,10 +295,9 @@ namespace ZMachineLibrary
                     else
                     {
                         output += zalphabets[currentAlphabet][c[i] - 6];
-                        if (log.IsDebugEnabled == true)
-                        {
-                            debugOutput += zalphabets[currentAlphabet][c[i] - 6]; z++;
-                        }
+
+                        debugOutput += zalphabets[currentAlphabet][c[i] - 6]; z++;
+                        TraceInternal.TraceVerbose(debugOutput);
                         currentAlphabet = 0;
                     }
 
@@ -316,10 +309,7 @@ namespace ZMachineLibrary
                 if (numBytes > 0 && bytesRead >= numBytes)
                 {
                     stringComplete = true;
-                    if (log.IsDebugEnabled == true)
-                    {
-                        log.Debug(debugOutput + "(" + z + ")");
-                    }
+                    TraceInternal.TraceVerbose(debugOutput + "(" + z + ")");
                 }
 
             }
@@ -336,11 +326,11 @@ namespace ZMachineLibrary
         // Print the file header
         public void DumpHeader()
         {
-            log.Debug("Type : " + GetByte(_address["ADDR_VERSION"]));
-            log.Debug("Base : " + GetWord(_address["ADDR_HIGH"]));
-            log.Debug("PC   : " + GetWord(_address["ADDR_INITIALPC"]));
-            log.Debug("Dict : " + GetWord(_address["ADDR_DICT"]));
-            log.Debug("Obj  : " + GetWord(_address["ADDR_OBJECTS"]));
+            TraceInternal.TraceVerbose("Type : " + GetByte(_address["ADDR_VERSION"]));
+            TraceInternal.TraceVerbose("Base : " + GetWord(_address["ADDR_HIGH"]));
+            TraceInternal.TraceVerbose("PC   : " + GetWord(_address["ADDR_INITIALPC"]));
+            TraceInternal.TraceVerbose("Dict : " + GetWord(_address["ADDR_DICT"]));
+            TraceInternal.TraceVerbose("Obj  : " + GetWord(_address["ADDR_OBJECTS"]));
         }
 
         public uint GetCrc32()

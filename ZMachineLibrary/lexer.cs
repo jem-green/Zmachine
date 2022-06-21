@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using log4net;
+using TracerLibrary;
 
 namespace ZMachineLibrary
 {
     public class Lexer
     {
         #region Fields
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         Memory memory;
         uint dictionaryAddress;
@@ -19,12 +18,12 @@ namespace ZMachineLibrary
         List<String> dictionary = new List<String>();
         List<uint> dictionaryIndex = new List<uint>();
         int[] wordStartIndex;
-        IConsoleIO io;
+        IZmachineIO io;
 
         uint mp = 0;                                 // Memory Pointer
         #endregion
         #region Constructors
-        public Lexer(Memory memory, IConsoleIO consoleIO)
+        public Lexer(Memory memory, IZmachineIO consoleIO)
         {
             this.memory = memory;
             dictionaryAddress = this.memory.GetWord(memory.GetAddress("ADDR_DICT"));
@@ -37,7 +36,8 @@ namespace ZMachineLibrary
             int maxInputLength = memory.GetByte((uint)textBufferAddress) - 1;    // byte 0 of the text-buffer should initially contain the maximum number of letters which can be typed, minus 1
             int parseBufferLength = memory.GetByte((uint)parseBufferAddress);
             mp = parseBufferAddress + 2;
-            string input = io.In();                                             // Get initial input from io terminal
+            //string input = io.In();                                             // Get initial input from io terminal
+            string input = "";
 
             if (input.Length > maxInputLength)
                 input = input.Remove(maxInputLength);                            // Limit input to size of text-buffer
@@ -55,7 +55,7 @@ namespace ZMachineLibrary
                 for (int i = 0; i < wordArray.Length; i++)
                 {
                     matchedWords[i] = Compare(wordArray[i]);                       // Stores the dictionary address of matched words (or 0 if no match)
-                                                                                   //                       log.Debug("Byte address of matched word: " + matchedWords[i]);
+                                                                                   //                       TraceInternal.TraceVerbose("Byte address of matched word: " + matchedWords[i]);
                 }
                 // Record dictionary addresses after comparing words
 
@@ -92,7 +92,7 @@ namespace ZMachineLibrary
             // Write next char from input into 3-char array (unimplemented)
 
             memory.SetByte((uint)(address + i + 1), 0);       // Write empty byte to terminate after read is complete.
-            log.Debug("Converted ZSCII string: " + memory.GetZSCII((uint)(address + 1), 0).str);
+            TraceInternal.TraceVerbose("Converted ZSCII string: " + memory.GetZSCII((uint)(address + 1), 0).str);
         }
 
         public void BuildDictionary()
@@ -112,7 +112,7 @@ namespace ZMachineLibrary
             {
                 dictionaryIndex.Add(i);         // Record dictionary entry address
                 Memory.StringAndReadLength dictEntry = memory.GetZSCII(i, 0);
-                //                  log.Debug(dictEntry.str);
+                //                  TraceInternal.TraceVerbose(dictEntry.str);
                 dictionary.Add(dictEntry.str);                                           // Find 'n' different dictionary entries and add words to list
             }
         }
@@ -126,11 +126,11 @@ namespace ZMachineLibrary
             {
                 if (dictionary[i] == word)
                 {
-                    log.Debug("Matched word: " + word + " at dictionary entry: " + memory.GetByte((uint)dictionaryIndex[i]) + " // " + dictionary[i] );
+                    TraceInternal.TraceVerbose("Matched word: " + word + " at dictionary entry: " + memory.GetByte((uint)dictionaryIndex[i]) + " // " + dictionary[i] );
                     return dictionaryIndex[i];
                 }
             }
-            log.Debug("Could not identify keyword: " + word);    // Game will have its own readout
+            TraceInternal.TraceVerbose("Could not identify keyword: " + word);    // Game will have its own readout
             return 0;
         }
 
@@ -170,7 +170,7 @@ namespace ZMachineLibrary
                 return 0;
             else if (zalphabets[0].IndexOf(letter) != -1)       // Take in ZSCII letter and return 5-bit Zchar
             {
-                log.Debug("Recognized character: " + (int)letter);
+                TraceInternal.TraceVerbose("Recognized character: " + (int)letter);
                 return zalphabets[0].IndexOf(letter) + 6;
             }
             else if (zalphabets[2].IndexOf(letter) != -1)
@@ -179,7 +179,7 @@ namespace ZMachineLibrary
             }
             else
             {
-                log.Debug("Invalid character: " + letter);
+                TraceInternal.TraceVerbose("Invalid character: " + letter);
                 return 0;
             }
         }

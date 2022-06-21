@@ -474,7 +474,6 @@ namespace ZMachineLibrary
 				TraceInternal.TraceVerbose($" Op ({o:X2}): {opcode?.Name} ");
 				var args = GetOperands(o);
 				opcode?.Handler(args);
-				////Log.Flush();
 			}
 		}
 
@@ -2296,8 +2295,6 @@ namespace ZMachineLibrary
 				string s = DecodeZsciiChars(chars);
 				TraceInternal.TraceVerbose($"{i+1} ({wordAddress:X4}): {s}");
 			}
-
-			//Log.Flush();
 		}
         #endregion
     }

@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using log4net;
+using TracerLibrary;
 
 namespace ZMachineLibrary
 {
     public class ObjectTable
     {
         #region Fields
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         Memory memory = new Memory(1024 * 128);
         public int tp = 0;                                 // pointer to move through tables
         public int objectId = 0;                           // Object ID
@@ -180,7 +179,7 @@ namespace ZMachineLibrary
             else
             {
                 propertyData = 0;
-                log.Debug("Property Length " + propLen + " is an unspecified length call for opcodes.");
+                TraceInternal.TraceVerbose("Property Length " + propLen + " is an unspecified length call for opcodes.");
             }
 
             return propertyData;
@@ -257,7 +256,7 @@ namespace ZMachineLibrary
         {
             byte a;                     // If can find the right byte in the memory, I can bitwise AND or NOT to fill or clear it.
             uint address = (uint)GetObjectAddress(objectId);
-            log.Debug("BEFORE address: " + address + " " + memory.GetByte(address) + "," + memory.GetByte(address + 1) + "," + memory.GetByte(address + 2) + "," + memory.GetByte(address + 3));
+            TraceInternal.TraceVerbose("BEFORE address: " + address + " " + memory.GetByte(address) + "," + memory.GetByte(address + 1) + "," + memory.GetByte(address + 2) + "," + memory.GetByte(address + 3));
             byte attributeByte = (byte)(attributeId / 8);           // The byte of the attribute header that we are working in
             int attributeShift = 7 - (attributeId % 8);
 
@@ -271,7 +270,7 @@ namespace ZMachineLibrary
                 a = memory.GetByte(address + (uint)attributeByte);
                 a &= (byte)~(1 << attributeShift);
             }
-            log.Debug("AFTER address: " + address + " " + memory.GetByte(address) + "," + memory.GetByte(address + 1) + "," + memory.GetByte(address + 2) + "," + memory.GetByte(address + 3));
+            TraceInternal.TraceVerbose("AFTER address: " + address + " " + memory.GetByte(address) + "," + memory.GetByte(address + 1) + "," + memory.GetByte(address + 2) + "," + memory.GetByte(address + 3));
             memory.SetByte(address + attributeByte, a);
         }
 
