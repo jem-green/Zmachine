@@ -4,7 +4,7 @@ using ZMachineLibrary;
 
 namespace ZMachineApp
 {
-    public class RichTextBoxIO : ZMachineIO
+    public class RichTextBoxIO : IZMachineIO
     {
         #region Event handling
 

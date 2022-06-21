@@ -69,7 +69,7 @@
   <ItemGroup>
     <Compile Include="Color.cs" />
     <Compile Include="Cursor.cs" />
-    <Compile Include="IConsoleIO.cs" />
+    <Compile Include="IZMachineIO.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="Opcode.cs" />
     <Compile Include="OperandType.cs" />

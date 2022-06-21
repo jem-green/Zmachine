@@ -7,7 +7,7 @@ namespace ZMachineConsole
 {
     class Program
     {
-        private static readonly ZMachineIO consoleIO = new ConsoleIO();
+        private static readonly IZMachineIO consoleIO = new ConsoleIO();
 
         static void Main(string[] args)
         {

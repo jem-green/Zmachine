@@ -4,7 +4,7 @@ using ZMachineLibrary;
 
 namespace ZMachineConsole
 {
-    public class ConsoleIO : ZMachineIO
+    public class ConsoleIO : IZMachineIO
     {
         #region Event handling
 

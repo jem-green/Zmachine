@@ -19,7 +19,7 @@ namespace ZMachineForm
     public partial class ConsoleForm : Form
     {
         // Prepare the zMachine
-        static ZMachineIO textBoxIO = null;
+        static IZMachineIO textBoxIO = null;
         Machine machine = null;
         int pos = 0;
         bool stopped = true;

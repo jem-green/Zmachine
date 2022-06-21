@@ -15,6 +15,15 @@ namespace ZMachineLibrary
 
 	public interface IZMachineIO
 	{
+        #region Properties
+        string Input { set; }
+        string Output { get; }
+        int Width { get; set; }
+		int Window { get; set; }
+		#endregion
+		#region Methods
+		void Clear();
+        Cursor Position(int w);
 		void Print(string s);
 		string Read(int max);
 		char ReadChar();
@@ -30,5 +39,8 @@ namespace ZMachineLibrary
 		void SetColor(ZColor foreground, ZColor background);
 		void SoundEffect(ushort number);
 		void Quit();
-	}
+        event EventHandler<TextEventArgs> TextReceived;
+        #endregion
+
+    }
 }
