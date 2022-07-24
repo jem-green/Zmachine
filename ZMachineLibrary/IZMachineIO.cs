@@ -39,6 +39,9 @@ namespace ZMachineLibrary
 		void SetColor(ZColor foreground, ZColor background);
 		void SoundEffect(ushort number);
 		void Quit();
+
+		#endregion
+		#region Events
         event EventHandler<TextEventArgs> TextReceived;
         #endregion
 

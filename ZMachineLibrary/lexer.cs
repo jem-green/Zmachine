@@ -40,7 +40,9 @@ namespace ZMachineLibrary
             string input = "";
 
             if (input.Length > maxInputLength)
+            {
                 input = input.Remove(maxInputLength);                            // Limit input to size of text-buffer
+            }
             input.TrimEnd('\n');                                                 // Remove carriage return from end of string  
             input = input.ToLower();                                             // Convert to lowercase
 

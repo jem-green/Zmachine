@@ -56,6 +56,8 @@ namespace ZMachineForm
             mruMenu = new MruStripMenuInline(fileMenuItem, recentFileToolStripMenuItem, new MruStripMenu.ClickedHandler(OnMruFile), 4);
             LoadFiles();
 
+            this.Text = "Zmachine " + ProductVersion;
+
             if ((filepath.Length > 0) && (name.Length > 0))
             {
                 lowerTextBox.Text = "";
@@ -67,7 +69,8 @@ namespace ZMachineForm
                 	FileStream fs = File.OpenRead(filenamePath);
                     mruMenu.AddFile(filenamePath);
                 	machine.LoadFile(fs);
-                    this.Text = name + " -Zmachine[" + machine.Version + "]";
+                    this.Text = "Zmachine " + ProductVersion + " - " + name + "[" + machine.Version + "]";
+
                     stopped = false;
                     this.workerThread = new Thread(new ThreadStart(this.Run));
                     this.workerThread.Start();
@@ -127,7 +130,9 @@ namespace ZMachineForm
                     machine = new Machine(textBoxIO);
                     FileStream fs = File.OpenRead(filenamePath);
                     machine.LoadFile(fs);
-                    this.Text = filename + " -Zmachine[" + machine.Version + "]";
+                    this.Text = "Zmachine " + ProductVersion + " - " + filename + "[" + machine.Version + "]";
+
+
                     stopped = false;
                     this.workerThread = new Thread(new ThreadStart(this.Run));
                     this.workerThread.Start();
@@ -273,7 +278,8 @@ namespace ZMachineForm
                     FileStream fs = File.OpenRead(filenamePath);
                     mruMenu.AddFile(filenamePath);
                     machine.LoadFile(fs);
-                    this.Text = filename + " -Zmachine[" + machine.Version + "]";
+                    this.Text = "Zmachine " + ProductVersion + " - " + filename + "[" + machine.Version + "]";
+
                     stopped = false;
                     this.workerThread = new Thread(new ThreadStart(this.Run));
                     textBoxIO.Clear();
